@@ -10,6 +10,7 @@
     "@types/yt-search": "^2.3.2",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
+    "copyfiles": "^2.4.1",
     "eslint": "^8.0.1",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^4.0.0",
@@ -22,11 +23,13 @@
   "dependencies": {
     "@discordjs/builders": "^0.6.0",
     "@discordjs/voice": "^0.6.0",
+    "@types/redis": "^2.8.32",
     "discord-api-types": "^0.23.1",
     "discord.js": "^13.2.0",
     "dotenv": "^10.0.0",
     "envalid": "^7.2.1",
     "libsodium-wrappers": "^0.7.9",
+    "redis": "^3.1.2",
     "spotify-url-info": "^2.2.3",
     "youtube-dl-exec": "^1.3.2",
     "yt-search": "^2.10.2",
@@ -35,6 +38,9 @@
   },
   "scripts": {
     "dev": "ts-node-dev  --respawn --transpile-only src/main.ts",
+    "prebuild": "rm -rf dist",
+    "build": "tsc",
+    "postbuild": "copyfiles -u 1 src/audio/*.mp3 dist/",
     "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix"
   }
 }

@@ -1,7 +1,8 @@
+import env from './env'
 import Discord, { Intents, Interaction, Snowflake } from 'discord.js'
 import { generateDependencyReport } from '@discordjs/voice'
 import { MusicSubscription } from './music/Subscription'
-import env from './env'
+
 import { Command } from './commands/Command'
 import { PlayCommand } from './commands/PlayCommand'
 import { PauseCommand } from './commands/PauseCommand'
@@ -9,13 +10,20 @@ import { SkipCommand } from './commands/SkipCommand'
 import { QueueCommand } from './commands/QueueCommand'
 import { LeaveCommand } from './commands/LeaveCommand'
 import { ResumeCommand } from './commands/ResumeCommand'
+
 import { Provider } from './providers/Provider'
 import { YoutubeProvider } from './providers/Youtube.provider'
 import { SpotifyProvider } from './providers/Spotify.provider'
 
+import BaseListener from './listeners/BaseListener'
+import ChkonListener from './listeners/ChkonListener'
+import DkholListener from './listeners/DkholListener'
+import PingListener from './listeners/PingListener'
+
 export class Main {
   private static _client: Discord.Client
   private static _commands: Record<string, Command> = {}
+  private static _listeners: BaseListener[] = []
   private static _providers: Map<string, Provider> = new Map()
 
   // Maps guild IDs to music subscriptions, which exist if the bot has an active VoiceConnection to the guild.
@@ -64,6 +72,14 @@ export class Main {
     console.log(`> Registered ${providers.length} music providers.`)
   }
 
+  static registerListeners(listeners: BaseListener[]) {
+    for (const listener of listeners) {
+      this._client.on('message', (arg) => listener.process(arg))
+    }
+
+    console.log(`> Registered ${listeners.length} message listener.`)
+  }
+
   static async start(): Promise<void> {
     this._client = new Discord.Client({
       intents: [
@@ -97,6 +113,7 @@ export class Main {
       new SkipCommand(),
       new LeaveCommand(),
     ])
+    this.registerListeners([new PingListener(), new ChkonListener(), new DkholListener()])
 
     this.listenForInteractions()
 
