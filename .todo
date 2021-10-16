@@ -1,0 +1,9 @@
+Providers:
+  ✔ Youtube @done(21-10-15 14:24)
+  ✔ Spotify @done(21-10-15 19:25) (could re-implement using: https://www.npmjs.com/package/spotify-playback-sdk-node)
+
+Features:
+  - Playlist support: @started(21-10-15 19:25)
+    ✔ Playlist support for Youtube @done(21-10-15 19:25)
+    - Playlist support for Spotify (not yet)
+  ✔ Search support @done(21-10-15 14:24)
