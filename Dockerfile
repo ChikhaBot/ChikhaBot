@@ -10,7 +10,7 @@ COPY package.json ./
 COPY yarn.lock ./
 COPY ecosystem.config.js ./
 
-RUN yarn install --silent --production
+RUN yarn install --non-interactive
 
 COPY ./dist ./dist
 
