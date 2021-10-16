@@ -2,7 +2,7 @@ FROM tarampampam/node:16.8-alpine
 
 RUN npm install pm2 -g
 RUN apk update \
-    && apk add --no-cache libsodium-dev
+    && apk add --no-cache libsodium-dev python
 
 WORKDIR /app
 
