@@ -1,5 +1,5 @@
 import env from './env'
-import Discord, { Intents, Interaction, Snowflake } from 'discord.js'
+import Discord, { Intents, Interaction, Message, Snowflake } from 'discord.js'
 import { generateDependencyReport } from '@discordjs/voice'
 import { MusicSubscription } from './music/Subscription'
 
@@ -19,12 +19,21 @@ import BaseListener from './listeners/BaseListener'
 import ChkonListener from './listeners/ChkonListener'
 import DkholListener from './listeners/DkholListener'
 import PingListener from './listeners/PingListener'
+import { VotekickCommand } from './commands/VoteKickCommand'
 
 export class Main {
   private static _client: Discord.Client
   private static _commands: Record<string, Command> = {}
   private static _listeners: BaseListener[] = []
   private static _providers: Map<string, Provider> = new Map()
+  private static _votekick: Map<
+    Snowflake,
+    {
+      userId: Snowflake
+      yes: Snowflake[]
+      no: Snowflake[]
+    }[]
+  > = new Map()
 
   // Maps guild IDs to music subscriptions, which exist if the bot has an active VoiceConnection to the guild.
   private static _subscriptions = new Map<Snowflake, MusicSubscription>()
@@ -41,6 +50,10 @@ export class Main {
 
   static get providers() {
     return this._providers
+  }
+
+  static get votekick() {
+    return this._votekick
   }
 
   static registerCommands(commands: Command[]): void {
@@ -88,6 +101,7 @@ export class Main {
         Intents.FLAGS.GUILD_MEMBERS,
         Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
         Intents.FLAGS.GUILD_VOICE_STATES, // Can speak
+        Intents.FLAGS.GUILD_BANS,
       ],
     })
 
@@ -112,6 +126,7 @@ export class Main {
       new QueueCommand(),
       new SkipCommand(),
       new LeaveCommand(),
+      new VotekickCommand(),
     ])
     this.registerListeners([new PingListener(), new ChkonListener(), new DkholListener()])
 
@@ -127,7 +142,66 @@ export class Main {
 
   static listenForInteractions(): void {
     this._client.on('interactionCreate', async (interaction: Interaction) => {
+      if (interaction.isButton()) {
+        try {
+          if (!interaction.guildId) return
+          const guildId = interaction.guildId
+          const idParams = interaction.customId.split('-')
+          const userId = idParams[1]
+          const existingVotes = Main.votekick.get(guildId) ?? []
+          const currentVote = existingVotes.find((vote) => vote.userId === userId) ?? {
+            userId: userId,
+            yes: [],
+            no: [],
+          }
+
+          console.log(`> Received interaction for ${userId} in ${guildId}`)
+          const respond = async (text: string) => {
+            await interaction.reply(text)
+          }
+          const hasVoted = currentVote.yes.includes(interaction.user.id) || currentVote.no.includes(interaction.user.id)
+
+          if (hasVoted) {
+            await respond('You have already voted! sir t7wa')
+            return
+          }
+
+          switch (idParams[0]) {
+            case 'yes':
+              currentVote.yes.push(interaction.user.id)
+              break
+            case 'no':
+              currentVote.no.push(interaction.user.id)
+              break
+            default:
+              break
+          }
+
+          const newVotes = existingVotes.filter((vote) => vote.userId !== userId)
+          newVotes.push(currentVote)
+          Main.votekick.set(guildId, newVotes)
+
+          await respond(`- Votekick results <@${userId}>: ${currentVote.yes.length} / ${currentVote.no.length}`)
+
+          if (currentVote.yes.length > 2 && currentVote.yes.length > currentVote.no.length) {
+            const member = await interaction.guild?.members.cache.get(userId)
+            if (member) {
+              await member.voice.disconnect('Kicked by votekick ! Sir dreb dwira.')
+              await (interaction.message as Message).delete()
+            }
+            await interaction.editReply(`- Votekick passed <@${userId}>! Khroj t9wd`)
+          }
+
+          if (currentVote.no.length > 2 && currentVote.no.length > currentVote.yes.length) {
+            await respond(`- Votekick failed <@${userId}>! GG WP`)
+            await (interaction.message as Message).delete()
+          }
+        } catch (err) {
+          console.error(err)
+        }
+      }
       if (!interaction.isCommand() || !interaction.guildId) return
+
       const subscription = this._subscriptions.get(interaction.guildId)
 
       const command = this._commands?.[interaction.commandName]

@@ -42,6 +42,14 @@ export abstract class Command implements ICommand {
                 .setRequired(opt?.required ?? false),
             )
             break
+          case 'USER':
+            command.addUserOption((option) =>
+              option
+                .setName(opt.name)
+                .setDescription(opt.description)
+                .setRequired(opt?.required ?? false),
+            )
+            break
           default:
             console.warn('Only string options are supported')
             break

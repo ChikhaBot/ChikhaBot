@@ -25,6 +25,7 @@
     "@discordjs/voice": "^0.6.0",
     "@types/redis": "^2.8.32",
     "discord-api-types": "^0.23.1",
+    "discord-buttons": "^4.0.0",
     "discord.js": "^13.2.0",
     "dotenv": "^10.0.0",
     "envalid": "^7.2.1",

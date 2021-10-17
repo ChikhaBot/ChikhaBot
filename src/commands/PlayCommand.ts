@@ -87,10 +87,10 @@ export class PlayCommand extends Command {
 
       const tracks = await provider.handle(url, {
         onStart() {
-          interaction.followUp({ content: 'Now playing!', ephemeral: true }).catch(console.warn)
+          interaction.followUp({ content: ``, ephemeral: true }).catch(console.warn)
         },
         onFinish() {
-          interaction.followUp({ content: 'Now finished!', ephemeral: true }).catch(console.warn)
+          interaction.followUp({ content: '', ephemeral: true }).catch(console.warn)
         },
         onError(error) {
           console.warn(error)
