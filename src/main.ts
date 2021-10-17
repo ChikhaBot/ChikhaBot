@@ -183,16 +183,19 @@ export class Main {
 
           await respond(`- Votekick results <@${userId}>: ${currentVote.yes.length} / ${currentVote.no.length}`)
 
-          if (currentVote.yes.length > 2 && currentVote.yes.length > currentVote.no.length) {
+          if (currentVote.yes.length >= 2 && currentVote.yes.length > currentVote.no.length) {
             const member = await interaction.guild?.members.cache.get(userId)
             if (member) {
               await member.voice.disconnect('Kicked by votekick ! Sir dreb dwira.')
               await (interaction.message as Message).delete()
+            } else {
+              await interaction.editReply(`- Votekick passed <@${userId}>! Walakine 3ele9 weld l97ba`)
+              return
             }
             await interaction.editReply(`- Votekick passed <@${userId}>! Khroj t9wd`)
           }
 
-          if (currentVote.no.length > 2 && currentVote.no.length > currentVote.yes.length) {
+          if (currentVote.no.length >= 2 && currentVote.no.length > currentVote.yes.length) {
             await respond(`- Votekick failed <@${userId}>! GG WP`)
             await (interaction.message as Message).delete()
           }
