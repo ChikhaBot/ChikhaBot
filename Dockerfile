@@ -15,8 +15,7 @@ RUN apk --no-cache --virtual build-dependencies add \
     make \
     g++ \
     && ln -s /usr/bin/python3 /usr/local/bin/python \
-    && yarn install --non-interactive \
-    && apk del build-dependencies
+    && yarn install --non-interactive
 
 COPY ./dist ./dist
 
