@@ -2,7 +2,7 @@ import { joinVoiceChannel, DiscordGatewayAdapterCreator, entersState, VoiceConne
 import { CommandInteraction, GuildMember } from 'discord.js'
 import { Main } from '../main'
 import { MusicSubscription } from '../music/Subscription'
-import { batchArray } from '../utils'
+import { batchArray, noop } from '../utils'
 import { Command } from './Command'
 import { yts } from './yts'
 
@@ -86,12 +86,8 @@ export class PlayCommand extends Command {
       await interaction.followUp(`Loading ${providerName} song...`)
 
       const tracks = await provider.handle(url, {
-        onStart() {
-          interaction.followUp({ content: ``, ephemeral: true }).catch(console.warn)
-        },
-        onFinish() {
-          interaction.followUp({ content: '', ephemeral: true }).catch(console.warn)
-        },
+        onStart: noop,
+        onFinish: noop,
         onError(error) {
           console.warn(error)
           interaction.followUp({ content: `Error: ${error.message}`, ephemeral: true }).catch(console.warn)
