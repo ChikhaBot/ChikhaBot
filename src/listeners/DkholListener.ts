@@ -24,7 +24,7 @@ class DkholListener extends BaseListener {
 
   introduce() {
     // Get all audio files
-    const files = fs.readdirSync('./src/audio/')
+    const files = fs.readdirSync('./audio/')
     const randomAudio = files[Math.floor(Math.random() * files.length)]
 
     // Create a dispatcher
