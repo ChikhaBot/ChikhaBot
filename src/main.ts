@@ -35,6 +35,8 @@ export class Main {
     }[]
   > = new Map()
 
+  private static features: Record<string, boolean> = {}
+
   // Maps guild IDs to music subscriptions, which exist if the bot has an active VoiceConnection to the guild.
   private static _subscriptions = new Map<Snowflake, MusicSubscription>()
 
@@ -110,6 +112,15 @@ export class Main {
 
       console.log(`=======================================`)
       console.log(`Ready! Logged in as ${botTag}`)
+      console.log(`=======================================`)
+      console.log(`Features:`)
+
+      Main.features.TTS = env.TTS
+
+      for (const feature in Main.features) {
+        console.log(`> ${feature}: ${Main.features[feature]}`)
+      }
+
       console.log(`=======================================`)
 
       if (env.DEBUG) {
@@ -223,4 +234,8 @@ export class Main {
   }
 }
 
-Main.start()
+if (env.ENABLED) {
+  Main.start()
+} else {
+  console.log('> Bot is disabled.')
+}

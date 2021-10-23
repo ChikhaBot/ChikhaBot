@@ -65,11 +65,11 @@ export class YoutubeTrack extends Track {
     const wrappedMethods = {
       onStart() {
         wrappedMethods.onStart = noop
-        methods.onStart()
+        methods.onStart(info.videoDetails.title)
       },
       onFinish() {
         wrappedMethods.onFinish = noop
-        methods.onFinish()
+        methods.onFinish(info.videoDetails.title)
       },
       onError(error: Error) {
         wrappedMethods.onError = noop

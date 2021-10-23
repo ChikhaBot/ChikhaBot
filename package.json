@@ -23,6 +23,7 @@
   "dependencies": {
     "@discordjs/builders": "^0.6.0",
     "@discordjs/voice": "^0.6.0",
+    "@google-cloud/text-to-speech": "^3.3.1",
     "@types/redis": "^2.8.32",
     "discord-api-types": "^0.23.1",
     "discord-buttons": "^4.0.0",
