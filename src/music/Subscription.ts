@@ -9,6 +9,7 @@ import {
   VoiceConnectionStatus,
 } from '@discordjs/voice'
 import { promisify } from 'util'
+import Queue from './Queue'
 import { Track } from './Track'
 
 const wait = promisify(setTimeout)
@@ -20,14 +21,12 @@ const wait = promisify(setTimeout)
 export class MusicSubscription {
   public readonly voiceConnection: VoiceConnection
   public readonly audioPlayer: AudioPlayer
-  public queue: Track[]
   public queueLock = false
   public readyLock = false
 
   public constructor(voiceConnection: VoiceConnection) {
     this.voiceConnection = voiceConnection
     this.audioPlayer = createAudioPlayer()
-    this.queue = []
 
     this.voiceConnection.on('stateChange', async (_, newState) => {
       if (newState.status === VoiceConnectionStatus.Disconnected) {
@@ -88,11 +87,11 @@ export class MusicSubscription {
       if (newState.status === AudioPlayerStatus.Idle && oldState.status !== AudioPlayerStatus.Idle) {
         // If the Idle state is entered from a non-Idle state, it means that an audio resource has finished playing.
         // The queue is then processed to start playing the next track, if one is available.
-        ;(oldState.resource as AudioResource<Track>).metadata.onFinish(this.queue?.[0]?.title ?? null)
+        ;(oldState.resource as AudioResource<Track>).metadata.onFinish(Queue.current?.title ?? null)
         void this.processQueue()
       } else if (newState.status === AudioPlayerStatus.Playing) {
         // If the Playing state has been entered, then a new track has started playback.
-        ;(newState.resource as AudioResource<Track>).metadata.onStart(this.queue?.[0]?.title ?? null)
+        ;(newState.resource as AudioResource<Track>).metadata.onStart(Queue.current?.title ?? null)
       }
     })
 
@@ -107,7 +106,7 @@ export class MusicSubscription {
    * @param track The track to add to the queue
    */
   public enqueue(track: Track) {
-    this.queue.push(track)
+    Queue.add(track)
     void this.processQueue()
   }
 
@@ -116,23 +115,25 @@ export class MusicSubscription {
    */
   public stop() {
     this.queueLock = true
-    this.queue = []
+    Queue.clear()
     this.audioPlayer.stop(true)
   }
 
   /**
    * Attempts to play a Track from the queue
    */
-  private async processQueue(): Promise<void> {
+  public async processQueue(): Promise<void> {
     // If the queue is locked (already being processed), is empty, or the audio player is already playing something, return
-    if (this.queueLock || this.audioPlayer.state.status !== AudioPlayerStatus.Idle || this.queue.length === 0) {
+    if (this.queueLock || this.audioPlayer.state.status !== AudioPlayerStatus.Idle || Queue.isEmpty()) {
       return
     }
     // Lock the queue to guarantee safe access
     this.queueLock = true
 
     // Take the first item from the queue. This is guaranteed to exist due to the non-empty check above.
-    const nextTrack = this.queue.shift()!
+    const nextTrack = Queue.next()!
+    console.log(`> Playing ${nextTrack.title} ${nextTrack.url} !`)
+
     try {
       // Attempt to convert the Track into an AudioResource (i.e. start streaming the video)
       const resource = await nextTrack.createAudioResource()

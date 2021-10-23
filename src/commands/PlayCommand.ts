@@ -1,6 +1,7 @@
 import { joinVoiceChannel, DiscordGatewayAdapterCreator, entersState, VoiceConnectionStatus } from '@discordjs/voice'
 import { CommandInteraction, GuildMember } from 'discord.js'
 import { Main } from '../main'
+import Queue from '../music/Queue'
 import { MusicSubscription } from '../music/Subscription'
 import { batchArray } from '../utils'
 import { Command } from './Command'
@@ -13,7 +14,7 @@ export class PlayCommand extends Command {
         name: 'song',
         type: 'STRING' as const,
         description: 'The URL of the song to play',
-        required: true,
+        required: false,
       },
     ])
   }
@@ -23,7 +24,7 @@ export class PlayCommand extends Command {
 
     const guildId = interaction.guildId as string
     // Extract the video URL from the command
-    const song = interaction.options.get('song')?.value as string
+    const song = interaction.options.get('song')?.value as string | undefined
 
     // If a connection to the guild doesn't already exist and the user is in a voice channel, join that channel
     // and create a subscription.
@@ -58,6 +59,19 @@ export class PlayCommand extends Command {
     }
 
     try {
+      // Check if queue is already populated
+      if (!song) {
+        if (!Queue.isEmpty() && subscription) {
+          subscription.processQueue()
+          await interaction.followUp('Playing old queue...')
+          return
+        }
+        await interaction.followUp(
+          'No song specified, please specify a song to play.' + interaction.options.get('song'),
+        )
+        return
+      }
+
       // Check if the requested song is a url or a search query
       let url = song
 

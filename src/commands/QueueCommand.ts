@@ -1,7 +1,7 @@
-import { AudioPlayerStatus, AudioResource } from '@discordjs/voice'
+import { AudioPlayerStatus } from '@discordjs/voice'
 import { CommandInteraction } from 'discord.js'
+import Queue from '../music/Queue'
 import { MusicSubscription } from '../music/Subscription'
-import { Track } from '../music/Track'
 import { Command } from './Command'
 
 export class QueueCommand extends Command {
@@ -14,12 +14,9 @@ export class QueueCommand extends Command {
       const current =
         subscription.audioPlayer.state.status === AudioPlayerStatus.Idle
           ? `Nothing is currently playing!`
-          : `Playing **${(subscription.audioPlayer.state.resource as AudioResource<Track>).metadata.title}**`
+          : `Playing **${Queue.current?.title}**`
 
-      const queue = subscription.queue
-        .slice(0, 5)
-        .map((track, index) => `${index + 1}) ${track.title}`)
-        .join('\n')
+      const queue = Queue.queue.map((track, index) => `${index + 1}) ${track.title}`).join('\n')
 
       await interaction.reply(`${current}\n\n${queue}`)
       return

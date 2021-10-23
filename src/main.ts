@@ -20,6 +20,7 @@ import ChkonListener from './listeners/ChkonListener'
 import DkholListener from './listeners/DkholListener'
 import PingListener from './listeners/PingListener'
 import { VotekickCommand } from './commands/VoteKickCommand'
+import Queue from './music/Queue'
 
 export class Main {
   private static _client: Discord.Client
@@ -235,6 +236,7 @@ export class Main {
 }
 
 if (env.ENABLED) {
+  Queue.init()
   Main.start()
 } else {
   console.log('> Bot is disabled.')

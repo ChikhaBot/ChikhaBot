@@ -24,7 +24,7 @@ class DkholListener extends BaseListener {
 
   introduce() {
     // Get all audio files
-    const files = fs.readdirSync('./audio/')
+    const files = fs.readdirSync(path.join(__dirname, '../audio'))
     const randomAudio = files[Math.floor(Math.random() * files.length)]
 
     // Create a dispatcher
@@ -46,7 +46,7 @@ class DkholListener extends BaseListener {
       this.audioPlayer = new AudioPlayer()
       this.audioPlayer.on('error', console.error)
       this.connection.subscribe(this.audioPlayer)
-      msg.reply('hani jay bb')
+      msg.reply('hani jaya bb')
     } else {
       msg.reply('3endak dkhol l chi voice channel')
     }

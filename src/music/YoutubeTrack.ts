@@ -21,8 +21,9 @@ export class YoutubeTrack extends Track {
    */
   public createAudioResource(): Promise<AudioResource<Track>> {
     return new Promise((resolve, reject) => {
+      const url = this.url.split('&list')[0]
       const process = ytdl(
-        this.url,
+        url,
         {
           o: '-',
           q: '',
@@ -58,22 +59,22 @@ export class YoutubeTrack extends Track {
    * @param methods Lifecycle callbacks
    * @returns The created Track
    */
-  public static async from(url: string, methods: Pick<Track, 'onStart' | 'onFinish' | 'onError'>): Promise<Track> {
+  public static async from(url: string, methods?: Pick<Track, 'onStart' | 'onFinish' | 'onError'>): Promise<Track> {
     const info = await getInfo(url)
 
     // The methods are wrapped so that we can ensure that they are only called once.
     const wrappedMethods = {
       onStart() {
         wrappedMethods.onStart = noop
-        methods.onStart(info.videoDetails.title)
+        methods?.onStart(info.videoDetails.title)
       },
       onFinish() {
         wrappedMethods.onFinish = noop
-        methods.onFinish(info.videoDetails.title)
+        methods?.onFinish(info.videoDetails.title)
       },
       onError(error: Error) {
         wrappedMethods.onError = noop
-        methods.onError(error)
+        methods?.onError(error)
       },
     }
 
