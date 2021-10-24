@@ -15,10 +15,11 @@ import { Provider } from './providers/Provider'
 import { YoutubeProvider } from './providers/Youtube.provider'
 import { SpotifyProvider } from './providers/Spotify.provider'
 
-import BaseListener from './listeners/BaseListener'
-import ChkonListener from './listeners/ChkonListener'
-import DkholListener from './listeners/DkholListener'
-import PingListener from './listeners/PingListener'
+import BaseListener from './messageListeners/BaseListener'
+import ChkonListener from './messageListeners/ChkonListener'
+import DkholListener from './messageListeners/DkholListener'
+import PingListener from './messageListeners/PingListener'
+import UserActionsListener from './VoiceChannelListeners/UserMovementListener'
 import { VotekickCommand } from './commands/VoteKickCommand'
 import Queue from './music/Queue'
 
@@ -88,12 +89,20 @@ export class Main {
     console.log(`> Registered ${providers.length} music providers.`)
   }
 
-  static registerListeners(listeners: BaseListener[]) {
+  static registerMessageListeners(listeners: BaseListener[]) {
     for (const listener of listeners) {
       this._client.on('message', (arg) => listener.process(arg))
     }
 
     console.log(`> Registered ${listeners.length} message listener.`)
+  }
+
+  static registerVoiceChannelListener(listeners : ){
+      for (const listener of listeners) {
+        this._client.on("voiceStateUpdate", (oldState,newState) => listener.process(oldState,newState))
+      }
+      console.log(`> Registered ${listeners.length} voice channel listener.`)
+
   }
 
   static async start(): Promise<void> {
@@ -140,7 +149,7 @@ export class Main {
       new LeaveCommand(),
       new VotekickCommand(),
     ])
-    this.registerListeners([new PingListener(), new ChkonListener(), new DkholListener()])
+    this.registerMessageListeners([new PingListener(), new ChkonListener(), new DkholListener()])
 
     this.listenForInteractions()
 
