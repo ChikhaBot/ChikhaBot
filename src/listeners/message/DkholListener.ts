@@ -19,7 +19,7 @@ class DkholListener extends BaseListener {
   }
 
   shouldRespond(msg: Message): boolean {
-    return super.shouldRespond(msg) && super.isMentioned(msg)
+    return true
   }
 
   introduce() {

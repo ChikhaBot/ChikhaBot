@@ -15,14 +15,14 @@ import { Provider } from './providers/Provider'
 import { YoutubeProvider } from './providers/Youtube.provider'
 import { SpotifyProvider } from './providers/Spotify.provider'
 
-import BaseListener from './messageListeners/BaseListener'
-import ChkonListener from './messageListeners/ChkonListener'
-import DkholListener from './messageListeners/DkholListener'
-import PingListener from './messageListeners/PingListener'
-import UserActionsListener from './VoiceChannelListeners/UserMovementListener'
+import BaseListener from './listeners/message/BaseListener'
+import ChkonListener from './listeners/message/ChkonListener'
+import DkholListener from './listeners/message/DkholListener'
+import PingListener from './listeners/message/PingListener'
+
+import UserActionsListener from './listeners/voice/UserMovementListener'
 import { VotekickCommand } from './commands/VoteKickCommand'
 import Queue from './music/Queue'
-import NinjutsuListener from './listeners/NinjutsuListener'
 
 export class Main {
   private static _client: Discord.Client
@@ -150,8 +150,8 @@ export class Main {
       new LeaveCommand(),
       new VotekickCommand(),
     ])
-    
-    this.registerListeners([new PingListener(), new ChkonListener(), new DkholListener(), new NinjutsuListener()])
+
+    this.registerListeners([new PingListener(), new ChkonListener(), new DkholListener()])
 
 
     this.listenForInteractions()

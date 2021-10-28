@@ -1,7 +1,7 @@
 import { ClientEvents, Message } from 'discord.js'
-import env from '../env'
-import Storage from '../storage/Base'
-import MemoryStorage from '../storage/Memory'
+import env from '../../env'
+import Storage from '../../storage/Base'
+import MemoryStorage from '../../storage/Memory'
 
 abstract class BaseListener {
   constructor(
