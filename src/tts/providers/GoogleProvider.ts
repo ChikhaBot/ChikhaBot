@@ -1,11 +1,11 @@
 import AbstractProvider from './AbstractProvider'
 import Payload from './Payload'
-import googleTTS from 'google-tts-api'
+import { getAllAudioUrls } from 'google-tts-api'
 import { Guild } from 'discord.js'
 import fs from 'fs'
 import path from 'path'
 
-export const languages = JSON.parse(fs.readFileSync(path.join(__dirname, '../../languages.json'), 'utf8'))
+export const languages = JSON.parse(fs.readFileSync(path.join(__dirname, '../../data/languages.json'), 'utf8'))
 
 /**
  * A concrete TTS provider for the Google Translate API TTS.
@@ -13,18 +13,17 @@ export const languages = JSON.parse(fs.readFileSync(path.join(__dirname, '../../
 export default class GoogleProvider extends AbstractProvider {
   public lang: string
   public slow: boolean
-  public name = 'google'
 
   constructor() {
     super()
-    this.lang = 'en'
+    this.lang = 'ar'
     this.slow = false
   }
 
   createPayload(sentence: string): Promise<Payload[]> {
     return new Promise((resolve, reject) => {
       try {
-        const data = googleTTS.getAllAudioUrls(sentence, {
+        const data = getAllAudioUrls(sentence, {
           lang: this.lang,
           slow: this.slow,
           splitPunct: ',.?!',

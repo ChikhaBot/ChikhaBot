@@ -1,5 +1,5 @@
 import BaseListener from './BaseListener'
-import { Message } from 'discord.js'
+import { Message, VoiceChannel } from 'discord.js'
 import fs from 'fs'
 import path from 'path'
 import {
@@ -9,6 +9,7 @@ import {
   joinVoiceChannel,
   VoiceConnection,
 } from '@discordjs/voice'
+import TTSPlayer from '../../tts/TTSPlayer'
 
 class DkholListener extends BaseListener {
   connection!: VoiceConnection
@@ -34,7 +35,7 @@ class DkholListener extends BaseListener {
 
   async do(msg: Message): Promise<void> {
     // Join the same voice channel of the author of the message
-    const channel = msg.member?.voice.channel
+    const channel = msg.member?.voice.channel as VoiceChannel
     if (channel) {
       this.connection = joinVoiceChannel({
         channelId: channel.id,
@@ -46,7 +47,11 @@ class DkholListener extends BaseListener {
       this.audioPlayer = new AudioPlayer()
       this.audioPlayer.on('error', console.error)
       this.connection.subscribe(this.audioPlayer)
-      msg.reply('hani jaya bb')
+
+      if (msg.guild) {
+        const test = new TTSPlayer(msg.guild)
+        test.say('hana jite bebe', channel)
+      }
     } else {
       msg.reply('3endak dkhol l chi voice channel')
     }

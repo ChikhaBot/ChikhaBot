@@ -1,5 +1,6 @@
-import { Guild, TextChannel, VoiceState } from 'discord.js'
+import { Guild, TextChannel, VoiceChannel, VoiceState } from 'discord.js'
 import RedisStorage from '../../storage/Redis'
+import { TTSSubscriptions } from '../../tts/TTSSubscriptions'
 import VoiceBaseListener from './VoiceBaseListener'
 
 export interface Tbergiga {
@@ -45,19 +46,18 @@ export default class M9edemListener extends VoiceBaseListener {
 
   onEventsChange(events: Carnet) {
     this.storage.set('tbergigat', JSON.stringify(events))
-    console.log(events)
   }
 
   async _process(newState: VoiceState, oldState: VoiceState) {
+    // TODO: move this from here
+    TTSSubscriptions.add(newState.guild)
+
     // Check for old events
     const storedEvents = await this.storage.get('tbergigat')
 
     if (storedEvents && this._events === {}) {
       this._events = JSON.parse(storedEvents as string)
     }
-
-    console.log(`old state: ${newState.member?.displayName} :  ${newState.channelId}`)
-    console.log(`state: ${oldState.member?.displayName} :  ${oldState.channelId}`)
 
     const joinedChannel = newState.channelId && !oldState.channelId
     const leftChannel = oldState.channelId && !newState.channelId
@@ -84,6 +84,7 @@ export default class M9edemListener extends VoiceBaseListener {
     if (generalChannel) {
       generalChannel.send(`${newState.member?.displayName} switched voice channels`)
     }
+    this.detectMusicChannel(newState)
   }
 
   onJoin(newState: VoiceState, oldState: VoiceState) {
@@ -91,12 +92,22 @@ export default class M9edemListener extends VoiceBaseListener {
     if (generalChannel) {
       generalChannel.send(`${newState.member?.displayName} joined the voice channel`)
     }
+    this.detectMusicChannel(newState)
   }
 
   onLeave(newState: VoiceState, oldState: VoiceState) {
     const generalChannel = getGeneralChannel(newState.guild)
     if (generalChannel) {
       generalChannel.send(`${newState.member?.displayName} left the voice channel`)
+    }
+  }
+
+  detectMusicChannel(newState: VoiceState) {
+    // Check if music channel
+    const musicChannel = getMusicChannel(newState.guild)
+    if (musicChannel?.id === newState.channelId) {
+      // Join the music channel
+      TTSSubscriptions.get(newState.guild.id)?.say(`Salam habiba, ache hebe el khater ? Dir /play`, musicChannel)
     }
   }
 }
@@ -106,4 +117,11 @@ function getGeneralChannel(guild: Guild): TextChannel | null {
   const firstChannel = textChannels.first()
 
   return (firstChannel as TextChannel) ?? null
+}
+
+function getMusicChannel(guild: Guild): VoiceChannel | null {
+  const textChannels = guild.channels.cache.filter((c) => c.isVoice() && c.name === 'Music')
+  const firstChannel = textChannels.first()
+
+  return (firstChannel as VoiceChannel) ?? null
 }
