@@ -1,37 +1,21 @@
-import { ClientEvents, TextChannel, VoiceState, GuildMember } from 'discord.js'
+import { VoiceState } from 'discord.js'
+import env from '../../env'
 import Storage from '../../storage/Base'
 import MemoryStorage from '../../storage/Memory'
 
 abstract class VoiceBaseListener {
-  constructor(
-    public event: keyof ClientEvents,
-    public command: string,
-    public storage: Storage = new MemoryStorage(),
-    public OwnerOnly = false,
-    public currentChannelID: string,
-    public maintextChannel: TextChannel,
-  ) {}
+  constructor(public storage: Storage = new MemoryStorage(), public OwnerOnly = false) {}
 
-  isMyCurrentChannel(): boolean {
-    return true
-  }
-  isMe(): boolean {
-    return false
+  isMe(state: VoiceState): boolean {
+    return state.member?.id === env.BOT_ID
   }
 
-  process(oldState: VoiceState, newState: VoiceState, user: GuildMember): void {
-    if (this.isMyCurrentChannel()) {
-      this.do()
-    } else {
-      userId = user
-      this.maintextChannel
-        .send(`<@${userId}> Khroj ola dkhel mchi so9i?`)
-        .then((message) => console.log(`Sent message: ${message.content}`))
-        .catch(console.error)
+  process(newState: VoiceState, oldState: VoiceState): void {
+    if (!this.isMe(newState)) {
+      this._process(newState, oldState)
     }
   }
-
-  abstract do(): void
+  abstract _process(newState: VoiceState, oldState: VoiceState): void
 }
 
-export default BaseListener
+export default VoiceBaseListener

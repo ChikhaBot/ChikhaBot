@@ -15,7 +15,7 @@ class DkholListener extends BaseListener {
   audioPlayer!: AudioPlayer
 
   constructor() {
-    super('message', 't3ali')
+    super('messageCreate', 't3ali')
   }
 
   shouldRespond(msg: Message): boolean {
@@ -24,7 +24,7 @@ class DkholListener extends BaseListener {
 
   introduce() {
     // Get all audio files
-    const files = fs.readdirSync(path.join(__dirname, '../audio'))
+    const files = fs.readdirSync(path.join(__dirname, '../../audio'))
     const randomAudio = files[Math.floor(Math.random() * files.length)]
 
     // Create a dispatcher

@@ -1,8 +1,8 @@
-import { Track } from '../music/Track'
-import { YoutubeTrack } from '../music/YoutubeTrack'
+import { Track } from '../Track'
+import { YoutubeTrack } from '../YoutubeTrack'
 import { Provider } from './Provider'
 import spotify from 'spotify-url-info'
-import { yts } from '../commands/yts'
+import { yts } from '../../commands/yts'
 
 export class SpotifyProvider implements Provider {
   name = 'spotify'

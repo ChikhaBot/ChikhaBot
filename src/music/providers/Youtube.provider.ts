@@ -1,7 +1,7 @@
 import ytdl from 'ytdl-core'
 import ytpl from 'ytpl'
-import { Track } from '../music/Track'
-import { YoutubeTrack } from '../music/YoutubeTrack'
+import { Track } from '../Track'
+import { YoutubeTrack } from '../YoutubeTrack'
 import { Provider } from './Provider'
 export class YoutubeProvider implements Provider {
   name = 'youtube'

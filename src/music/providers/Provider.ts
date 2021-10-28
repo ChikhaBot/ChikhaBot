@@ -1,4 +1,4 @@
-import { Track } from '../music/Track'
+import { Track } from '../Track'
 
 export interface Provider {
   name: string

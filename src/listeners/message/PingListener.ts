@@ -3,7 +3,7 @@ import { Message } from 'discord.js'
 
 class PingListener extends BaseListener {
   constructor() {
-    super('message', 'ping')
+    super('messageCreate', 'ping')
   }
 
   do(msg: Message): void {

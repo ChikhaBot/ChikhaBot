@@ -1,5 +1,5 @@
 export default abstract class Storage {
-  prefix = 'bot_'
+  prefix = 'chikha_bot_'
 
   constructor(public name: string) {}
 

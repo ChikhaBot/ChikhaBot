@@ -28,7 +28,7 @@ abstract class BaseListener {
   }
 
   process(msg: Message): void {
-    if (msg.content.indexOf(this.command) > -1) {
+    if (msg.content.toLowerCase().indexOf(this.command) > -1) {
       if (this.shouldRespond(msg)) {
         this.do(msg)
       } else {

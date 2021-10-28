@@ -9,9 +9,10 @@
       "request": "launch",
       "name": "Debug bot",
       "protocol": "inspector",
+      "runtimeExecutable":"${workspaceRoot}/node_modules/.bin/ts-node-dev",
       "args": ["${workspaceRoot}/src/main.ts"],
       "cwd": "${workspaceRoot}",
-      "runtimeArgs": ["-r", "ts-node/register"],
+      "restart":true
     }
   ]
 }
