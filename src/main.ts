@@ -22,6 +22,7 @@ import PingListener from './messageListeners/PingListener'
 import UserActionsListener from './VoiceChannelListeners/UserMovementListener'
 import { VotekickCommand } from './commands/VoteKickCommand'
 import Queue from './music/Queue'
+import NinjutsuListener from './listeners/NinjutsuListener'
 
 export class Main {
   private static _client: Discord.Client
@@ -149,7 +150,9 @@ export class Main {
       new LeaveCommand(),
       new VotekickCommand(),
     ])
-    this.registerMessageListeners([new PingListener(), new ChkonListener(), new DkholListener()])
+    
+    this.registerListeners([new PingListener(), new ChkonListener(), new DkholListener(), new NinjutsuListener()])
+
 
     this.listenForInteractions()
 
