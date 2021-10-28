@@ -7,7 +7,7 @@ export class TTSCommand extends Command {
   constructor() {
     super('tts', 'Text to speech', [
       {
-        name: 'message',
+        name: 'messageCreate',
         description: 'The message to play in voice',
         type: 'STRING',
         required: true,

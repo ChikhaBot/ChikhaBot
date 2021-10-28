@@ -3,7 +3,7 @@ import { Message } from 'discord.js'
 
 class ChkonListener extends BaseListener {
   constructor() {
-    super('message', 'chkon')
+    super('messageCreate', 'chkon')
   }
 
   async do(msg: Message): Promise<void> {

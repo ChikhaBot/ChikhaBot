@@ -1,7 +1,7 @@
 import { ClientEvents, Message } from 'discord.js'
-import env from '../env'
-import Storage from '../storage/Base'
-import MemoryStorage from '../storage/Memory'
+import env from '../../env'
+import Storage from '../../storage/Base'
+import MemoryStorage from '../../storage/Memory'
 
 abstract class BaseListener {
   constructor(
@@ -28,7 +28,7 @@ abstract class BaseListener {
   }
 
   process(msg: Message): void {
-    if (msg.content.indexOf(this.command) > -1) {
+    if (msg.content.toLowerCase().indexOf(this.command) > -1) {
       if (this.shouldRespond(msg)) {
         this.do(msg)
       } else {
