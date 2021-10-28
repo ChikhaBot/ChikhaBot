@@ -1,9 +1,9 @@
 import BaseListener from './BaseListener'
 import { Message } from 'discord.js'
 
-class PingListener extends BaseListener {
+class ChikhaListener extends BaseListener {
   constructor() {
-    super('messageCreate', 'chikha aji')
+    super('messageCreate', 'hikha aji')
   }
 
   do(msg: Message): void {
@@ -21,4 +21,4 @@ class PingListener extends BaseListener {
   }
 }
 
-export default PingListener
+export default ChikhaListener

@@ -19,12 +19,13 @@ import BaseListener from './listeners/message/BaseListener'
 import ChkonListener from './listeners/message/ChkonListener'
 import DkholListener from './listeners/message/DkholListener'
 import PingListener from './listeners/message/PingListener'
+import ChikhaListener from './listeners/message/ChikhaListener'
+
+import M9edemListener from './listeners/voice/M9edemListener'
 
 import { VotekickCommand } from './commands/VoteKickCommand'
 import Queue from './music/Queue'
 import VoiceBaseListener from './listeners/voice/VoiceBaseListener'
-import M9edemListener from './listeners/voice/M9edemListener'
-import ChikhaListener from './listeners/message/ChikhaListener'
 
 export class Main {
   private static _client: Discord.Client
