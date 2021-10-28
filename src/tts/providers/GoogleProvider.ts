@@ -2,10 +2,6 @@ import AbstractProvider from './AbstractProvider'
 import Payload from './Payload'
 import { getAllAudioUrls } from 'google-tts-api'
 import { Guild } from 'discord.js'
-import fs from 'fs'
-import path from 'path'
-
-export const languages = JSON.parse(fs.readFileSync(path.join(__dirname, '../../data/languages.json'), 'utf8'))
 
 /**
  * A concrete TTS provider for the Google Translate API TTS.
@@ -51,23 +47,6 @@ export default class GoogleProvider extends AbstractProvider {
     const speed = slow ? 'slow' : 'normal'
 
     return `(TTS): Playing googleTTS for ${sentence} with language ${lang} with ${speed} speed in guild ${guild.name}.`
-  }
-
-  setLang(newLang: string) {
-    if (!languages[newLang]) {
-      throw new Error('Invalid language!')
-    }
-
-    if (this.lang === newLang) {
-      throw new Error(`Language is already set to ${newLang}!`)
-    }
-
-    this.lang = newLang
-    return languages[this.lang].name
-  }
-
-  getLang() {
-    return languages[this.lang].name
   }
 
   setSpeed(newSpeed: string) {
