@@ -1,4 +1,4 @@
-import { Guild, TextChannel, VoiceChannel, VoiceState } from 'discord.js'
+import { Guild, TextChannel, VoiceChannel, VoiceState, GuildMember, StageChannel } from 'discord.js'
 import RedisStorage from '../../storage/Redis'
 import { TTSSubscriptions } from '../../tts/TTSSubscriptions'
 import VoiceBaseListener from './VoiceBaseListener'
@@ -81,18 +81,35 @@ export default class M9edemListener extends VoiceBaseListener {
 
   onChange(newState: VoiceState, oldState: VoiceState) {
     const generalChannel = getGeneralChannel(newState.guild)
+    const member = newState.member
+
     if (generalChannel) {
-      generalChannel.send(`${newState.member?.displayName} switched voice channels`)
+      generalChannel.send(`${member?.displayName} switched voice channels`)
     }
     this.detectMusicChannel(newState)
+
+    const voiceChannel  = newState.channel
+    const is_alone = this.isAloneInChannel(member,voiceChannel)
+    if(is_alone && !this.isMe(newState)){
+      generalChannel?.send(`${member?.displayName} rah bo7do f ${voiceChannel?.name}`)
+    }
+
   }
 
   onJoin(newState: VoiceState, oldState: VoiceState) {
-    const generalChannel = getGeneralChannel(newState.guild)
+    const generalChannel = getGeneralChannel(newState.guild) //redundant or whatever it should be defined at bot connection not at every ev
+    const member = newState.member
+
     if (generalChannel) {
-      generalChannel.send(`${newState.member?.displayName} joined the voice channel`)
+      generalChannel.send(`${member?.displayName} joined the voice channel`)
     }
     this.detectMusicChannel(newState)
+    const voiceChannel  = newState.channel
+
+    const is_alone = this.isAloneInChannel(member,voiceChannel)
+    if(is_alone && !this.isMe(newState)){
+      generalChannel?.send(`${member?.displayName} rah bo7do f ${voiceChannel?.name}`)
+    }
   }
 
   onLeave(newState: VoiceState, oldState: VoiceState) {
@@ -110,8 +127,14 @@ export default class M9edemListener extends VoiceBaseListener {
       TTSSubscriptions.get(newState.guild.id)?.say(`Salam habiba, ache hebe el khater ? Dir /play`, musicChannel)
     }
   }
+  isAloneInChannel(member : GuildMember|null,voiceChannel :  VoiceChannel | StageChannel |null){
+    if(member && voiceChannel && voiceChannel.members.get(member.id) && voiceChannel.members.size == 1){
+      return true;
+    }
+    return false;
+  }
 }
-
+ 
 function getGeneralChannel(guild: Guild): TextChannel | null {
   const textChannels = guild.channels.cache.filter((c) => c.isText() && c.name === 'mute-me')
   const firstChannel = textChannels.first()
