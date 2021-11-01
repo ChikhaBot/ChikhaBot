@@ -80,7 +80,8 @@ export default class M9edemListener extends VoiceBaseListener {
   }
 
   onChange(newState: VoiceState, oldState: VoiceState) {
-    const generalChannel = getGeneralChannel(newState.guild)
+    const guild = newState.guild;
+    const generalChannel = getGeneralChannel(guild)
     const member = newState.member
 
     if (generalChannel) {
@@ -88,11 +89,17 @@ export default class M9edemListener extends VoiceBaseListener {
     }
     this.detectMusicChannel(newState)
 
-    const voiceChannel  = newState.channel
-    const is_alone = this.isAloneInChannel(member,voiceChannel)
-    if(is_alone && !this.isMe(newState)){
+    const voiceChannel = newState.channel
+    const is_alone = this.isAloneInChannel(member, voiceChannel)
+    if (is_alone && !this.isMe(newState)) {
       generalChannel?.send(`${member?.displayName} rah bo7do f ${voiceChannel?.name}`)
     }
+    const me_in_channel = oldState.channel?.members.find(user => this.isMemberMe(user));
+    if (me_in_channel && this.isAloneInChannel(me_in_channel, oldState.channel)) {
+      console.log("Ah shit i'm gonna leave")
+      this.LeaveAfter(10, guild);
+    }
+
 
   }
 
@@ -104,19 +111,27 @@ export default class M9edemListener extends VoiceBaseListener {
       generalChannel.send(`${member?.displayName} joined the voice channel`)
     }
     this.detectMusicChannel(newState)
-    const voiceChannel  = newState.channel
+    const voiceChannel = newState.channel
 
-    const is_alone = this.isAloneInChannel(member,voiceChannel)
-    if(is_alone && !this.isMe(newState)){
+    const is_alone = this.isAloneInChannel(member, voiceChannel)
+    if (is_alone && !this.isMe(newState)) {
       generalChannel?.send(`${member?.displayName} rah bo7do f ${voiceChannel?.name}`)
     }
   }
 
   onLeave(newState: VoiceState, oldState: VoiceState) {
-    const generalChannel = getGeneralChannel(newState.guild)
+    const guild = oldState.guild;
+    const generalChannel = getGeneralChannel(guild)
     if (generalChannel) {
       generalChannel.send(`${newState.member?.displayName} left the voice channel`)
     }
+    const me_in_channel = oldState.channel?.members.find(user => this.isMemberMe(user));
+    console.log("me_in_channel")
+    if (me_in_channel && this.isAloneInChannel(me_in_channel, oldState.channel)) {
+      console.log("Ah shit i'm gonna leave")
+      this.LeaveAfter(10, guild);
+    }
+
   }
 
   detectMusicChannel(newState: VoiceState) {
@@ -127,14 +142,14 @@ export default class M9edemListener extends VoiceBaseListener {
       TTSSubscriptions.get(newState.guild.id)?.say(`Salam habiba, ache hebe el khater ? Dir /play`, musicChannel)
     }
   }
-  isAloneInChannel(member : GuildMember|null,voiceChannel :  VoiceChannel | StageChannel |null){
-    if(member && voiceChannel && voiceChannel.members.get(member.id) && voiceChannel.members.size == 1){
+  isAloneInChannel(member: GuildMember | null, voiceChannel: VoiceChannel | StageChannel | null) {
+    if (member && voiceChannel && voiceChannel.members.get(member.id) && voiceChannel.members.size == 1) {
       return true;
     }
     return false;
   }
 }
- 
+
 function getGeneralChannel(guild: Guild): TextChannel | null {
   const textChannels = guild.channels.cache.filter((c) => c.isText() && c.name === 'mute-me')
   const firstChannel = textChannels.first()
