@@ -1,5 +1,5 @@
 import env from './env'
-import Discord, { ButtonInteraction, Intents, Interaction, Message, Snowflake } from 'discord.js'
+import Discord, { ButtonInteraction, Intents, Interaction, Message, Snowflake, Team } from 'discord.js'
 import { generateDependencyReport } from '@discordjs/voice'
 import { MusicSubscription } from './music/Subscription'
 
@@ -28,6 +28,8 @@ import M9edemListener from './listeners/voice/M9edemListener'
 import { VotekickCommand } from './commands/VoteKickCommand'
 import Queue from './music/Queue'
 import VoiceBaseListener from './listeners/voice/VoiceBaseListener'
+import { json } from 'stream/consumers'
+import { type } from 'os'
 
 export class Main {
   private static _client: Discord.Client
@@ -76,10 +78,11 @@ export class Main {
     this._client.on('messageCreate', async (message) => {
       if (!message.guild) return
       if (!this._client.application?.owner) await this._client.application?.fetch()
-
+       const owners  =  this._client.application?.owner as Team;
+      console.log(owners.members.findKey(user => user.id == message.author.id))
       if (
         message.content.toLowerCase() === `${Main.prefix}chikha` &&
-        message.author.id === this._client.application?.owner?.id
+        owners.members.findKey(user => user.id == message.author.id)
       ) {
         await message.guild.commands.set(commands.map((command) => command.toJson()) as any)
         await message.reply('Deployed!')
