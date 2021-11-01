@@ -10,6 +10,8 @@ import { SkipCommand } from './commands/SkipCommand'
 import { QueueCommand } from './commands/QueueCommand'
 import { LeaveCommand } from './commands/LeaveCommand'
 import { ResumeCommand } from './commands/ResumeCommand'
+import { AfkCommand } from './commands/AfkCommand'
+
 
 import { Provider } from './music/providers/Provider'
 import { YoutubeProvider } from './music/providers/Youtube.provider'
@@ -151,6 +153,7 @@ export class Main {
       new SkipCommand(),
       new LeaveCommand(),
       new VotekickCommand(),
+      new AfkCommand(),
     ])
 
     this.registerMessageListeners([new PingListener(), new ChkonListener(), new DkholListener(), new ChikhaListener()])
