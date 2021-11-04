@@ -100,7 +100,6 @@ export class Main {
 
   static async registerCommands() {
     const commands = await this.commands()
-    console.log(commands)
     for (const command of commands) {
       this._commands[command.name] = command
     }
