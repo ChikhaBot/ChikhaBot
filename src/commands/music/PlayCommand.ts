@@ -8,8 +8,8 @@ import { BaseCommand } from '../BaseCommand'
 import { yts } from '../../utils/yts'
 
 export default class PlayCommand extends BaseCommand {
-  constructor() {
-    super('play', 'Play a song', [
+  constructor(client: Main) {
+    super(client, 'play', 'Play a song', [
       {
         name: 'song',
         type: 'STRING' as const,

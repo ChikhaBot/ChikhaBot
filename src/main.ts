@@ -18,8 +18,7 @@ import VoiceBaseListener from './listeners/voice/VoiceBaseListener'
 
 export class Main {
   private static _client: Discord.Client
-  private static _commands: Record<string, BaseCommand> = {}
-  private static _listeners: BaseListener[] = []
+  static _commands: Record<string, BaseCommand> = {}
   private static _providers: Map<string, BaseProvider> = new Map()
   private static _votekick: Map<
     Snowflake,
@@ -66,7 +65,7 @@ export class Main {
       const filePath = file.split('commands/')[1]
       promises.push(
         import(`./commands/${filePath}`).then((module) => {
-          return new module.default()
+          return new module.default(this)
         }),
       )
     }
@@ -95,7 +94,7 @@ export class Main {
 
   static async registerCommands() {
     const commands = await this.commands()
-
+    console.log(commands)
     for (const command of commands) {
       this._commands[command.name] = command
     }
@@ -109,7 +108,7 @@ export class Main {
       const owners = this._client.application?.owner as Team
 
       if (
-        message.content.toLowerCase() === `${Main.prefix}${Main.keyword} ` &&
+        message.content.toLowerCase() === `${Main.prefix}${Main.keyword}` &&
         owners.members.findKey((user) => user.id == message.author.id)
       ) {
         await message.guild.commands.set(commands.map((command) => command.toJson()))

@@ -1,10 +1,11 @@
 import { CommandInteraction } from 'discord.js'
 import { MusicSubscription } from '../../music/Subscription'
 import { BaseCommand } from '../BaseCommand'
+import { Main } from '../../main'
 
 export default class PauseCommand extends BaseCommand {
-  constructor() {
-    super('pause', 'Pauses the song that is currently playing')
+  constructor(client: Main) {
+    super(client, 'pause', 'Pauses the song that is currently playing')
   }
   async execute(interaction: CommandInteraction, subscription: MusicSubscription): Promise<void> {
     if (subscription) {

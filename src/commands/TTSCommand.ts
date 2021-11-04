@@ -1,13 +1,14 @@
 import { CommandInteraction } from 'discord.js'
 import env from '../env'
+import { Main } from '../main'
 import { MusicSubscription } from '../music/Subscription'
 import { BaseCommand } from './BaseCommand'
 
 export default class TTSCommand extends BaseCommand {
-  constructor() {
-    super('tts', 'Text to speech', [
+  constructor(client: Main) {
+    super(client, 'tts', 'Text to speech', [
       {
-        name: 'messageCreate',
+        name: 'tts',
         description: 'The message to play in voice',
         type: 'STRING',
         required: true,

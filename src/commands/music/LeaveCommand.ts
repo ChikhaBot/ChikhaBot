@@ -4,8 +4,8 @@ import { MusicSubscription } from '../../music/Subscription'
 import { BaseCommand } from '../BaseCommand'
 
 export default class LeaveCommand extends BaseCommand {
-  constructor() {
-    super('leave', 'Leave the voice channel')
+  constructor(client: Main) {
+    super(client, 'leave', 'Leave the voice channel')
   }
   async execute(interaction: CommandInteraction, subscription: MusicSubscription): Promise<void> {
     if (subscription) {
