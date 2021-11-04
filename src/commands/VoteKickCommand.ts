@@ -1,7 +1,7 @@
 import { CommandInteraction, MessageActionRow, MessageButton } from 'discord.js'
 import { Main } from '../main'
-import { Command } from './Command'
-export class VotekickCommand extends Command {
+import { BaseCommand } from './BaseCommand'
+export default class VotekickCommand extends BaseCommand {
   constructor() {
     super('votekick', 'Vote kick a user from the server', [
       {

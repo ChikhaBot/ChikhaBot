@@ -3,39 +3,24 @@ import Discord, { ButtonInteraction, Intents, Interaction, Message, Snowflake, T
 import { generateDependencyReport } from '@discordjs/voice'
 import { MusicSubscription } from './music/Subscription'
 
-import { Command } from './commands/Command'
-import { PlayCommand } from './commands/PlayCommand'
-import { PauseCommand } from './commands/PauseCommand'
-import { SkipCommand } from './commands/SkipCommand'
-import { QueueCommand } from './commands/QueueCommand'
-import { LeaveCommand } from './commands/LeaveCommand'
-import { ResumeCommand } from './commands/ResumeCommand'
-import { AfkCommand } from './commands/AfkCommand'
+import { BaseCommand } from './commands/BaseCommand'
 
-
-import { Provider } from './music/providers/Provider'
+import { BaseProvider } from './music/providers/Provider'
 import { YoutubeProvider } from './music/providers/Youtube.provider'
 import { SpotifyProvider } from './music/providers/Spotify.provider'
 
 import BaseListener from './listeners/message/BaseListener'
-import ChkonListener from './listeners/message/ChkonListener'
-import DkholListener from './listeners/message/DkholListener'
-import PingListener from './listeners/message/PingListener'
-import ChikhaListener from './listeners/message/ChikhaListener'
 
-import M9edemListener from './listeners/voice/M9edemListener'
-
-import { VotekickCommand } from './commands/VoteKickCommand'
 import Queue from './music/Queue'
+import path from 'path'
+import glob from 'glob'
 import VoiceBaseListener from './listeners/voice/VoiceBaseListener'
-import { json } from 'stream/consumers'
-import { type } from 'os'
 
 export class Main {
   private static _client: Discord.Client
-  private static _commands: Record<string, Command> = {}
+  private static _commands: Record<string, BaseCommand> = {}
   private static _listeners: BaseListener[] = []
-  private static _providers: Map<string, Provider> = new Map()
+  private static _providers: Map<string, BaseProvider> = new Map()
   private static _votekick: Map<
     Snowflake,
     {
@@ -47,10 +32,12 @@ export class Main {
 
   private static features: Record<string, boolean> = {}
 
-  // Maps guild IDs to music subscriptions, which exist if the bot has an active VoiceConnection to the guild.
+  // Maps guild IDs to music subscriptions,
+  // which exist if the bot has an active VoiceConnection to the guild.
   private static _subscriptions = new Map<Snowflake, MusicSubscription>()
 
   static prefix = '!'
+  static keyword = 'chikha'
 
   static get Client(): Discord.Client {
     return this._client
@@ -68,7 +55,47 @@ export class Main {
     return this._votekick
   }
 
-  static registerCommands(commands: Command[]): void {
+  static async commands() {
+    const promises: Promise<BaseCommand>[] = []
+
+    const commandFiles = glob
+      .sync(path.join(__dirname, 'commands/**/*.ts'))
+      .filter((file) => !file.toLowerCase().includes('base'))
+
+    for (const file of commandFiles) {
+      const filePath = file.split('commands/')[1]
+      promises.push(
+        import(`./commands/${filePath}`).then((module) => {
+          return new module.default()
+        }),
+      )
+    }
+
+    return Promise.all(promises)
+  }
+
+  static async listeners(type: 'message' | 'voice'): Promise<(BaseListener | VoiceBaseListener)[]> {
+    const promises: Promise<BaseListener>[] = []
+
+    const listenerFiles = glob
+      .sync(path.join(__dirname, `listeners/${type}/**/*.ts`))
+      .filter((file) => !file.toLowerCase().includes('base'))
+
+    for (const file of listenerFiles) {
+      const filePath = file.split(`listeners/${type}/`)[1]
+      promises.push(
+        import(`./listeners/${type}/${filePath}`).then((module) => {
+          return new module.default()
+        }),
+      )
+    }
+
+    return Promise.all(promises)
+  }
+
+  static async registerCommands() {
+    const commands = await this.commands()
+
     for (const command of commands) {
       this._commands[command.name] = command
     }
@@ -78,19 +105,22 @@ export class Main {
     this._client.on('messageCreate', async (message) => {
       if (!message.guild) return
       if (!this._client.application?.owner) await this._client.application?.fetch()
-       const owners  =  this._client.application?.owner as Team;
-      console.log(owners.members.findKey(user => user.id == message.author.id))
+
+      const owners = this._client.application?.owner as Team
+
       if (
-        message.content.toLowerCase() === `${Main.prefix}chikha` &&
-        owners.members.findKey(user => user.id == message.author.id)
+        message.content.toLowerCase() === `${Main.prefix}${Main.keyword} ` &&
+        owners.members.findKey((user) => user.id == message.author.id)
       ) {
-        await message.guild.commands.set(commands.map((command) => command.toJson()) as any)
-        await message.reply('Deployed!')
+        await message.guild.commands.set(commands.map((command) => command.toJson()))
+        await message.reply('Commands deployed!')
       }
     })
+
+    await this.registerInteractionListeners()
   }
 
-  static registerProviders(providers: Provider[]): void {
+  static registerProviders(providers: BaseProvider[]): void {
     for (const provider of providers) {
       this._providers.set(provider.name, provider)
     }
@@ -98,78 +128,23 @@ export class Main {
     console.log(`> Registered ${providers.length} music providers.`)
   }
 
-  static registerMessageListeners(listeners: BaseListener[]) {
+  static async registerMessageListeners() {
+    const listeners = await this.listeners('message')
     for (const listener of listeners) {
-      this._client.on('messageCreate', (arg) => listener.process(arg))
+      this._client.on('messageCreate', (arg) => (listener as BaseListener).process(arg))
     }
 
     console.log(`> Registered ${listeners.length} message listener.`)
   }
 
-  static registerVoiceListeners(listeners: VoiceBaseListener[]) {
+  static async registerVoiceListeners() {
+    const listeners = await this.listeners('voice')
     for (const listener of listeners) {
-      this._client.on('voiceStateUpdate', (oldState, newState) => listener.process(newState, oldState))
+      this._client.on('voiceStateUpdate', (oldState, newState) =>
+        (listener as VoiceBaseListener).process(newState, oldState),
+      )
     }
     console.log(`> Registered ${listeners.length} voice channel listener.`)
-  }
-
-  static async start(): Promise<void> {
-    this._client = new Discord.Client({
-      intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MEMBERS,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-        Intents.FLAGS.GUILD_VOICE_STATES, // Can speak
-        Intents.FLAGS.GUILD_BANS,
-      ],
-    })
-
-    this._client.on('ready', (client) => {
-      const botTag = client.user?.tag
-
-      console.log(`=======================================`)
-      console.log(`Ready! Logged in as ${botTag}`)
-      console.log(`=======================================`)
-      console.log(`Features:`)
-
-      Main.features.TTS = env.TTS
-
-      for (const feature in Main.features) {
-        console.log(`> ${feature}: ${Main.features[feature]}`)
-      }
-
-      console.log(`=======================================`)
-
-      if (env.DEBUG) {
-        console.log('Dependacy report: ')
-        console.log(generateDependencyReport())
-      }
-    })
-
-    this.registerProviders([new YoutubeProvider(), new SpotifyProvider()])
-    this.registerCommands([
-      new PlayCommand(),
-      new PauseCommand(),
-      new ResumeCommand(),
-      new QueueCommand(),
-      new SkipCommand(),
-      new LeaveCommand(),
-      new VotekickCommand(),
-      new AfkCommand(),
-    ])
-
-    this.registerMessageListeners([new PingListener(), new ChkonListener(), new DkholListener(), new ChikhaListener()])
-    this.registerVoiceListeners([new M9edemListener()])
-
-    this.listenForInteractions()
-
-    this._client.on('error', console.error)
-    this._client.login(env.BOT_TOKEN)
-  }
-
-  static async stop(): Promise<void> {
-    await this._client.destroy()
   }
 
   static async handleButtonInteraction(interaction: ButtonInteraction) {
@@ -234,7 +209,7 @@ export class Main {
     }
   }
 
-  static listenForInteractions(): void {
+  static registerInteractionListeners(): void {
     this._client.on('interactionCreate', async (interaction: Interaction) => {
       if (interaction.isButton()) {
         await Main.handleButtonInteraction(interaction)
@@ -256,6 +231,54 @@ export class Main {
         await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true })
       }
     })
+  }
+
+  static async start(): Promise<void> {
+    this._client = new Discord.Client({
+      intents: [
+        Intents.FLAGS.GUILDS,
+        Intents.FLAGS.GUILD_MESSAGES,
+        Intents.FLAGS.GUILD_MEMBERS,
+        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+        Intents.FLAGS.GUILD_VOICE_STATES, // Can speak
+        Intents.FLAGS.GUILD_BANS,
+      ],
+    })
+
+    this._client.on('ready', (client) => {
+      const botTag = client.user?.tag
+
+      console.log(`=======================================`)
+      console.log(`Ready! Logged in as ${botTag}`)
+      console.log(`=======================================`)
+      console.log(`Features:`)
+
+      Main.features.TTS = env.TTS
+
+      for (const feature in Main.features) {
+        console.log(`> ${feature}: ${Main.features[feature]}`)
+      }
+
+      console.log(`=======================================`)
+
+      if (env.DEBUG) {
+        console.log('Dependacy report: ')
+        console.log(generateDependencyReport())
+      }
+    })
+
+    this.registerProviders([new YoutubeProvider(), new SpotifyProvider()])
+
+    await this.registerCommands()
+    await this.registerMessageListeners()
+    await this.registerVoiceListeners()
+
+    this._client.on('error', console.error)
+    this._client.login(env.BOT_TOKEN)
+  }
+
+  static async stop(): Promise<void> {
+    await this._client.destroy()
   }
 }
 

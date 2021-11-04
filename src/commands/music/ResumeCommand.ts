@@ -1,8 +1,8 @@
 import { CommandInteraction } from 'discord.js'
-import { MusicSubscription } from '../music/Subscription'
-import { Command } from './Command'
+import { MusicSubscription } from '../../music/Subscription'
+import { BaseCommand } from '../BaseCommand'
 
-export class ResumeCommand extends Command {
+export default class ResumeCommand extends BaseCommand {
   constructor() {
     super('resume', 'Resume playback of the current song')
   }

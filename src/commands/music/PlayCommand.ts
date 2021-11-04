@@ -1,13 +1,13 @@
 import { joinVoiceChannel, DiscordGatewayAdapterCreator, entersState, VoiceConnectionStatus } from '@discordjs/voice'
 import { CommandInteraction, GuildMember } from 'discord.js'
-import { Main } from '../main'
-import Queue from '../music/Queue'
-import { MusicSubscription } from '../music/Subscription'
-import { batchArray } from '../utils'
-import { Command } from './Command'
-import { yts } from './yts'
+import { Main } from '../../main'
+import Queue from '../../music/Queue'
+import { MusicSubscription } from '../../music/Subscription'
+import { batchArray } from '../../utils'
+import { BaseCommand } from '../BaseCommand'
+import { yts } from '../../utils/yts'
 
-export class PlayCommand extends Command {
+export default class PlayCommand extends BaseCommand {
   constructor() {
     super('play', 'Play a song', [
       {

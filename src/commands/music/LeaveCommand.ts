@@ -1,9 +1,9 @@
 import { CommandInteraction } from 'discord.js'
-import { Main } from '../main'
-import { MusicSubscription } from '../music/Subscription'
-import { Command } from './Command'
+import { Main } from '../../main'
+import { MusicSubscription } from '../../music/Subscription'
+import { BaseCommand } from '../BaseCommand'
 
-export class LeaveCommand extends Command {
+export default class LeaveCommand extends BaseCommand {
   constructor() {
     super('leave', 'Leave the voice channel')
   }

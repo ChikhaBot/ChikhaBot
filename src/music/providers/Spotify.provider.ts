@@ -1,10 +1,10 @@
 import { Track } from '../Track'
 import { YoutubeTrack } from '../YoutubeTrack'
-import { Provider } from './Provider'
+import { BaseProvider } from './Provider'
 import spotify from 'spotify-url-info'
-import { yts } from '../../commands/yts'
+import { yts } from '../../utils/yts'
 
-export class SpotifyProvider implements Provider {
+export class SpotifyProvider implements BaseProvider {
   name = 'spotify'
 
   async handle(url: string, methods: Pick<Track, 'onStart' | 'onFinish' | 'onError'>): Promise<Track[]> {

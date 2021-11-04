@@ -1,5 +1,5 @@
 import { SlashCommandBuilder } from '@discordjs/builders'
-import { CommandInteraction } from 'discord.js'
+import { ApplicationCommandDataResolvable, CommandInteraction } from 'discord.js'
 
 export interface Option {
   name: string
@@ -15,7 +15,7 @@ export interface ICommand {
   execute(interaction: CommandInteraction): Promise<void>
 }
 
-export abstract class Command implements ICommand {
+export abstract class BaseCommand implements ICommand {
   name: string
   description: string
   options?: Option[]
@@ -28,7 +28,7 @@ export abstract class Command implements ICommand {
 
   abstract execute(interaction: CommandInteraction, ...args: unknown[]): Promise<void>
 
-  toJson() {
+  toJson(): ApplicationCommandDataResolvable {
     const command = new SlashCommandBuilder().setName(this.name).setDescription(this.description)
 
     if (this.options) {
@@ -57,6 +57,6 @@ export abstract class Command implements ICommand {
       })
     }
 
-    return command.toJSON()
+    return command.toJSON() as unknown as ApplicationCommandDataResolvable
   }
 }

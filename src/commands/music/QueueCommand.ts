@@ -1,10 +1,10 @@
 import { AudioPlayerStatus } from '@discordjs/voice'
 import { CommandInteraction } from 'discord.js'
-import Queue from '../music/Queue'
-import { MusicSubscription } from '../music/Subscription'
-import { Command } from './Command'
+import Queue from '../../music/Queue'
+import { MusicSubscription } from '../../music/Subscription'
+import { BaseCommand } from '../BaseCommand'
 
-export class QueueCommand extends Command {
+export default class QueueCommand extends BaseCommand {
   constructor() {
     super('queue', 'See the music queue')
   }

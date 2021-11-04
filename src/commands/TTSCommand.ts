@@ -1,9 +1,9 @@
 import { CommandInteraction } from 'discord.js'
 import env from '../env'
 import { MusicSubscription } from '../music/Subscription'
-import { Command } from './Command'
+import { BaseCommand } from './BaseCommand'
 
-export class TTSCommand extends Command {
+export default class TTSCommand extends BaseCommand {
   constructor() {
     super('tts', 'Text to speech', [
       {

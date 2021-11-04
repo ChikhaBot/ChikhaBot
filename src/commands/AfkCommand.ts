@@ -1,23 +1,22 @@
 import { CommandInteraction } from 'discord.js'
-import { Main } from '../main'
-import { Command } from './Command'
+import { BaseCommand } from './BaseCommand'
 
-export class AfkCommand extends Command {
+export default class AfkCommand extends BaseCommand {
   constructor() {
-    super('afk', 'Put user into AFK and specify reason',[
-        {
-          name: 'user',
-          description: 'The user to put afk',
-          type: 'USER',
-          required: true,
-        },
-        {
-            name: 'reason',
-            description: 'The reason why he is going afk',
-            type: 'STRING',
-            required: false
-        }
-      ])
+    super('afk', 'Put user into AFK and specify reason', [
+      {
+        name: 'user',
+        description: 'The user to put afk',
+        type: 'USER',
+        required: true,
+      },
+      {
+        name: 'reason',
+        description: 'The reason why he is going afk',
+        type: 'STRING',
+        required: false,
+      },
+    ])
   }
   async execute(interaction: CommandInteraction): Promise<void> {
     const guildId = interaction.guildId as string
@@ -25,6 +24,5 @@ export class AfkCommand extends Command {
     const reason = interaction.options.get('reason')?.value as string
 
     await interaction.reply(`${userId} is going AFK, Reason : ${reason} `)
-    
   }
 }
