@@ -56,8 +56,12 @@ export class Main {
     const promises: Promise<BaseCommand>[] = []
 
     const commandFiles = glob
-      .sync(path.join(__dirname, 'commands/**/*.ts'))
-      .filter((file) => !file.toLowerCase().includes('base'))
+      .sync(path.join(__dirname, 'commands/**/*'))
+      .filter(
+        (file) =>
+          !file.toLowerCase().includes('base') &&
+          (file.toLowerCase().endsWith('.ts') || file.toLowerCase().endsWith('.js')),
+      )
 
     for (const file of commandFiles) {
       const filePath = file.split('commands/')[1]
@@ -75,8 +79,12 @@ export class Main {
     const promises: Promise<BaseListener>[] = []
 
     const listenerFiles = glob
-      .sync(path.join(__dirname, `listeners/${type}/**/*.ts`))
-      .filter((file) => !file.toLowerCase().includes('base'))
+      .sync(path.join(__dirname, `listeners/${type}/**/*`))
+      .filter(
+        (file) =>
+          !file.toLowerCase().includes('base') &&
+          (file.toLowerCase().endsWith('.ts') || file.toLowerCase().endsWith('.js')),
+      )
 
     for (const file of listenerFiles) {
       const filePath = file.split(`listeners/${type}/`)[1]
