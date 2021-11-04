@@ -1,11 +1,11 @@
 import { CommandInteraction } from 'discord.js'
-import { Main } from '../main'
-import { MusicSubscription } from '../music/Subscription'
-import { Command } from './Command'
+import { Main } from '../../main'
+import { MusicSubscription } from '../../music/Subscription'
+import { BaseCommand } from '../BaseCommand'
 
-export class LeaveCommand extends Command {
-  constructor() {
-    super('leave', 'Leave the voice channel')
+export default class LeaveCommand extends BaseCommand {
+  constructor(client: Main) {
+    super(client, 'leave', 'Leave the voice channel')
   }
   async execute(interaction: CommandInteraction, subscription: MusicSubscription): Promise<void> {
     if (subscription) {

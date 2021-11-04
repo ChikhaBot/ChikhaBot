@@ -1,12 +1,13 @@
 import { AudioPlayerStatus } from '@discordjs/voice'
 import { CommandInteraction } from 'discord.js'
-import Queue from '../music/Queue'
-import { MusicSubscription } from '../music/Subscription'
-import { Command } from './Command'
+import Queue from '../../music/Queue'
+import { MusicSubscription } from '../../music/Subscription'
+import { BaseCommand } from '../BaseCommand'
+import { Main } from '../../main'
 
-export class QueueCommand extends Command {
-  constructor() {
-    super('queue', 'See the music queue')
+export default class QueueCommand extends BaseCommand {
+  constructor(client: Main) {
+    super(client, 'queue', 'See the music queue')
   }
   async execute(interaction: CommandInteraction, subscription: MusicSubscription): Promise<void> {
     // Print out the current queue, including up to the next 5 tracks to be played.

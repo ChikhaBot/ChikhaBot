@@ -6,6 +6,7 @@
   "author": "Anas Mazouni <madadj4@gmail.com>",
   "license": "MIT",
   "devDependencies": {
+    "@types/glob": "^7.2.0",
     "@types/node": "^16.10.9",
     "@types/yt-search": "^2.3.2",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
@@ -30,6 +31,7 @@
     "discord.js": "^13.2.0",
     "dotenv": "^10.0.0",
     "envalid": "^7.2.1",
+    "glob": "^7.2.0",
     "google-tts-api": "^2.0.2",
     "libsodium-wrappers": "^0.7.9",
     "redis": "^3.1.2",
@@ -43,7 +45,7 @@
     "dev": "ts-node-dev  --respawn --transpile-only src/main.ts",
     "prebuild": "rm -rf dist",
     "build": "tsc",
-    "postbuild": "copyfiles -u 1 src/audio/*.mp3 dist/",
+    "postbuild": "copyfiles -u 1 src/static/audio/*.mp3 dist/",
     "lint": "eslint '*/**/*.{js,ts,tsx}' --quiet --fix"
   }
 }

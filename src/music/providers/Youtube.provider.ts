@@ -2,8 +2,9 @@ import ytdl from 'ytdl-core'
 import ytpl from 'ytpl'
 import { Track } from '../Track'
 import { YoutubeTrack } from '../YoutubeTrack'
-import { Provider } from './Provider'
-export class YoutubeProvider implements Provider {
+import { BaseProvider } from './Provider'
+
+export class YoutubeProvider implements BaseProvider {
   name = 'youtube'
 
   async handle(url: string, methods: Pick<Track, 'onStart' | 'onFinish' | 'onError'>) {

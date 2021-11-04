@@ -25,11 +25,11 @@ class DkholListener extends BaseListener {
 
   introduce() {
     // Get all audio files
-    const files = fs.readdirSync(path.join(__dirname, '../../audio'))
+    const files = fs.readdirSync(path.join(__dirname, '../../static/audio'))
     const randomAudio = files[Math.floor(Math.random() * files.length)]
 
     // Create a dispatcher
-    const audioResource = createAudioResource(path.join(__dirname, '../audio', randomAudio))
+    const audioResource = createAudioResource(path.join(__dirname, '../static/audio', randomAudio))
     this.audioPlayer.play(audioResource)
   }
 

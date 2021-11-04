@@ -1,11 +1,12 @@
 import { CommandInteraction } from 'discord.js'
-import Queue from '../music/Queue'
-import { MusicSubscription } from '../music/Subscription'
-import { Command } from './Command'
+import { Main } from '../../main'
+import Queue from '../../music/Queue'
+import { MusicSubscription } from '../../music/Subscription'
+import { BaseCommand } from '../BaseCommand'
 
-export class SkipCommand extends Command {
-  constructor() {
-    super('skip', 'Skip to the next song in the queue', [
+export default class SkipCommand extends BaseCommand {
+  constructor(client: Main) {
+    super(client, 'skip', 'Skip to the next song in the queue', [
       {
         name: 'index',
         type: 'STRING' as const,
