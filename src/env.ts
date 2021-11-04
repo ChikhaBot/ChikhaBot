@@ -11,8 +11,6 @@ const env = cleanEnv(process.env, {
   REDIS_HOST: str({ default: 'localhost' }),
   REDIS_PORT: str({ default: '6379' }),
   REDIS_PASSWORD: str({ default: '' }),
-  GOOGLE_APPLICATION_CREDENTIALS: str(),
-  TTS: bool({ default: false }),
   ENABLED: bool({ default: true }),
 })
 
