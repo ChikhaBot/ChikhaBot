@@ -80,7 +80,7 @@ export default class M9edemListener extends VoiceBaseListener {
   }
 
   onChange(newState: VoiceState, oldState: VoiceState) {
-    const guild = newState.guild;
+    const guild = newState.guild
     const generalChannel = getGeneralChannel(guild)
     const member = newState.member
 
@@ -94,13 +94,11 @@ export default class M9edemListener extends VoiceBaseListener {
     if (is_alone && !this.isMe(newState)) {
       generalChannel?.send(`${member?.displayName} rah bo7do f ${voiceChannel?.name}`)
     }
-    const me_in_channel = oldState.channel?.members.find(user => this.isMemberMe(user));
+    const me_in_channel = oldState.channel?.members.find((user) => this.isMemberMe(user))
     if (me_in_channel && this.isAloneInChannel(me_in_channel, oldState.channel)) {
       console.log("Ah shit i'm gonna leave")
-      this.LeaveAfter(10, guild);
+      this.LeaveAfter(10, guild)
     }
-
-
   }
 
   onJoin(newState: VoiceState, oldState: VoiceState) {
@@ -120,18 +118,17 @@ export default class M9edemListener extends VoiceBaseListener {
   }
 
   onLeave(newState: VoiceState, oldState: VoiceState) {
-    const guild = oldState.guild;
+    const guild = oldState.guild
     const generalChannel = getGeneralChannel(guild)
     if (generalChannel) {
       generalChannel.send(`${newState.member?.displayName} left the voice channel`)
     }
-    const me_in_channel = oldState.channel?.members.find(user => this.isMemberMe(user));
-    console.log("me_in_channel")
+    const me_in_channel = oldState.channel?.members.find((user) => this.isMemberMe(user))
+    console.log('me_in_channel')
     if (me_in_channel && this.isAloneInChannel(me_in_channel, oldState.channel)) {
       console.log("Ah shit i'm gonna leave")
-      this.LeaveAfter(10, guild);
+      this.LeaveAfter(10, guild)
     }
-
   }
 
   detectMusicChannel(newState: VoiceState) {
@@ -144,9 +141,9 @@ export default class M9edemListener extends VoiceBaseListener {
   }
   isAloneInChannel(member: GuildMember | null, voiceChannel: VoiceChannel | StageChannel | null) {
     if (member && voiceChannel && voiceChannel.members.get(member.id) && voiceChannel.members.size == 1) {
-      return true;
+      return true
     }
-    return false;
+    return false
   }
 }
 
