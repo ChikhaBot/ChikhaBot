@@ -12,6 +12,7 @@ const env = cleanEnv(process.env, {
   REDIS_PORT: str({ default: '6379' }),
   REDIS_PASSWORD: str({ default: '' }),
   ENABLED: bool({ default: true }),
+  VOTE_THRESHOLD: str({ default: '3' }),
 })
 
 export default env

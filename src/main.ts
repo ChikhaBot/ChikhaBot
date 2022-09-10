@@ -1,5 +1,5 @@
 import env from './env'
-import Discord, { ButtonInteraction, Intents, Interaction, Message, Snowflake, Team } from 'discord.js'
+import Discord, { ButtonInteraction, Intents, Interaction, Snowflake, Team } from 'discord.js'
 import { generateDependencyReport } from '@discordjs/voice'
 import { MusicSubscription } from './music/Subscription'
 
@@ -154,25 +154,24 @@ export class Main {
   static async handleButtonInteraction(interaction: ButtonInteraction) {
     try {
       if (!interaction.guildId) return
+
+      console.log(`> Received button interaction: ${interaction.customId}`)
+
+      const voteThreshold = parseInt(env.VOTE_THRESHOLD ?? '3')
       const guildId = interaction.guildId
+
       const idParams = interaction.customId.split('-')
       const userId = idParams[1]
       const existingVotes = Main.votekick.get(guildId) ?? []
       const currentVote = existingVotes.find((vote) => vote.userId === userId) ?? {
-        userId: userId,
+        userId,
         yes: [],
         no: [],
-      }
-
-      console.log(`> Received interaction for ${userId} in ${guildId}`)
-      const respond = async (text: string) => {
-        await interaction.reply(text)
       }
       const hasVoted = currentVote.yes.includes(interaction.user.id) || currentVote.no.includes(interaction.user.id)
 
       if (hasVoted) {
-        await respond('You have already voted! sir t7wa')
-        return
+        return interaction.reply(`You have already voted! sir t7wa <@${interaction.user.id}>`)
       }
 
       switch (idParams[0]) {
@@ -186,27 +185,35 @@ export class Main {
           break
       }
 
-      const newVotes = existingVotes.filter((vote) => vote.userId !== userId)
-      newVotes.push(currentVote)
+      await interaction.reply(`<@${interaction.user.id}> voted: ${idParams[0]}`)
+
+      const newVotes = [...existingVotes.filter((vote) => vote.userId !== userId), currentVote]
+
       Main.votekick.set(guildId, newVotes)
 
-      await respond(`- Votekick results <@${userId}>: ${currentVote.yes.length} / ${currentVote.no.length}`)
+      // Update original message
+      const originalMessageId = interaction.message.id
+      const originalMessage = await interaction.channel?.messages.fetch(originalMessageId)
 
-      if (currentVote.yes.length >= 2 && currentVote.yes.length > currentVote.no.length) {
-        const member = await interaction.guild?.members.cache.get(userId)
-        if (member) {
-          await member.voice.disconnect('Kicked by votekick ! Sir dreb dwira.')
-          await (interaction.message as Message).delete()
-        } else {
-          await interaction.editReply(`- Votekick passed <@${userId}>! Walakine 3ele9 weld l97ba`)
-          return
-        }
-        await interaction.editReply(`- Votekick passed <@${userId}>! Khroj t9wd`)
+      if (originalMessage) {
+        // Update message text
+        const text = `Votiw njriw 3la zamel boh <@${userId}> (yes: ${currentVote.yes.length} , no: ${currentVote.no.length})`
+        await originalMessage.edit(text)
       }
 
-      if (currentVote.no.length >= 2 && currentVote.no.length > currentVote.yes.length) {
-        await respond(`- Votekick failed <@${userId}>! GG WP`)
-        await (interaction.message as Message).delete()
+      if (currentVote.yes.length >= voteThreshold && currentVote.yes.length > currentVote.no.length) {
+        const member = await interaction.guild?.members.cache.get(userId)
+        if (member) {
+          console.log('Kicking member')
+          // await member.voice.disconnect('Kicked by votekick ! Sir dreb dwira.')
+          await interaction.reply(`- Votekick passed <@${userId}>! Khroj t9wd`)
+        } else {
+          return interaction.reply(`- Votekick passed <@${userId}>! Walakine 3ele9 weld l97ba`)
+        }
+      }
+
+      if (currentVote.no.length >= voteThreshold && currentVote.no.length > currentVote.yes.length) {
+        await interaction.reply(`- Votekick failed <@${userId}>! GG WP`)
       }
     } catch (err) {
       console.error(err)
