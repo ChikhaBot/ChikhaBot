@@ -1,5 +1,5 @@
 import env from './env'
-import Discord, { ButtonInteraction, Intents, Interaction, Snowflake, Team } from 'discord.js'
+import Discord, { ButtonInteraction, GatewayIntentBits, Interaction, Snowflake, Team } from 'discord.js'
 import { generateDependencyReport } from '@discordjs/voice'
 import { MusicSubscription } from './music/Subscription'
 
@@ -206,6 +206,7 @@ export class Main {
         if (member) {
           console.log('Kicking member')
           // await member.voice.disconnect('Kicked by votekick ! Sir dreb dwira.')
+          await member.timeout(1 * 1000, 'Kicked by votekick ! Sir dreb dwira.')
           await interaction.reply(`- Votekick passed <@${userId}>! Khroj t9wd`)
         } else {
           return interaction.reply(`- Votekick passed <@${userId}>! Walakine 3ele9 weld l97ba`)
@@ -247,12 +248,12 @@ export class Main {
   static async start(): Promise<void> {
     this._client = new Discord.Client({
       intents: [
-        Intents.FLAGS.GUILDS,
-        Intents.FLAGS.GUILD_MESSAGES,
-        Intents.FLAGS.GUILD_MEMBERS,
-        Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
-        Intents.FLAGS.GUILD_VOICE_STATES, // Can speak
-        Intents.FLAGS.GUILD_BANS,
+        GatewayIntentBits.Guilds,
+        GatewayIntentBits.GuildMessages,
+        GatewayIntentBits.GuildMembers,
+        GatewayIntentBits.GuildMessageReactions,
+        GatewayIntentBits.GuildVoiceStates,
+        GatewayIntentBits.GuildBans,
       ],
     })
 

@@ -1,6 +1,7 @@
-import { CommandInteraction, MessageActionRow, MessageButton } from 'discord.js'
+import { ActionRowBuilder, ButtonBuilder, ButtonStyle, CommandInteraction } from 'discord.js'
 import { Main } from '../main'
 import { BaseCommand } from './BaseCommand'
+
 export default class VotekickCommand extends BaseCommand {
   constructor(client: Main) {
     super(client, 'votekick', 'Vote kick a user from the server', [
@@ -16,9 +17,9 @@ export default class VotekickCommand extends BaseCommand {
     const guildId = interaction.guildId as string
     const userId = interaction.options.get('user')?.value as string
 
-    const voteButtons = new MessageActionRow().addComponents(
-      new MessageButton().setCustomId(`yes-${userId}`).setLabel('Jri 3lih').setStyle('SUCCESS'),
-      new MessageButton().setCustomId(`no-${userId}`).setLabel('Laysameh').setStyle('SECONDARY'),
+    const voteButtons = new ActionRowBuilder().addComponents(
+      new ButtonBuilder().setCustomId(`yes-${userId}`).setLabel('Jri 3lih').setStyle(ButtonStyle.Primary),
+      new ButtonBuilder().setCustomId(`no-${userId}`).setLabel('Laysameh').setStyle(ButtonStyle.Danger),
     )
 
     const existingVotes = Main.votekick.get(guildId) ?? []
@@ -32,7 +33,7 @@ export default class VotekickCommand extends BaseCommand {
 
     await interaction.reply({
       content: `Votiw njriw 3la zamel boh <@${userId}> (yes: 0, no: 0)`,
-      components: [voteButtons],
+      components: [voteButtons as any],
     })
     return
   }
