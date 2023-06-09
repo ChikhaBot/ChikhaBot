@@ -1,4 +1,4 @@
-FROM tarampampam/node:16.8-alpine
+FROM tarampampam/node:16.9-alpine
 
 RUN npm install pm2 -g
 RUN apk update \
